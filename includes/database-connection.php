@@ -1,12 +1,12 @@
 <?php
 $type = 'mysql';
 $server = 'localhost:8889';
-$db = '';
+$db = 'phpbook-1';
 $port = '8889';
 $charset = 'utf8mb4';
 
-$username = '';
-$password = '';
+$username = 'root';
+$password = 'root';
 
 $options = [
   PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
