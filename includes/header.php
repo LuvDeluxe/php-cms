@@ -17,7 +17,7 @@
     <div class="container">
       <a class="skip-link" href="#content">Skip to content</a>
       <div class="logo">
-        <a href="/php-cms/index.php"><img src="img/logo.png" alt="Creative Folk"></a>
+        <a href="/CMS/php-cms/index.php"><img src="img/logo.png" alt="Creative Folk"></a>
       </div>
       <nav role="navigation">
         <button id="toggle-navigation" aria-expanded="false">
