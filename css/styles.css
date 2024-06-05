@@ -582,6 +582,73 @@ nav.pagination {
     -moz-osx-font-smoothing: grayscale;
 }
 
+/* Admin */
+
+table {
+    width: 100%;
+    margin-top: 2rem;
+    table-layout: fixed;
+    background-color: transparent;
+    border-collapse: collapse;
+}
+
+table.admin,
+table.categories {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+th {
+    text-align: left;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    font-weight: normal;
+    border-bottom: 1px solid #d6d6d6;
+    padding: .75rem;
+    vertical-align: top;
+}
+
+td {
+    padding: .75rem;
+    vertical-align: top;
+    border-top: 1px solid #dee2e6;
+}
+
+td img {
+    max-width: 200px;
+}
+
+p.alt {
+    margin-top: .5em;
+}
+
+@media (min-width: 860px) {
+    th.edit, th.view {
+        width: 5em;
+    }
+    th.create,
+    th.del,
+    th.pub {
+        width: 7em;
+    }
+    th.created {
+        width: 9em;
+    }
+}
+
+.image-placeholder {
+    background-color: #d6d6d6;
+    background-image: url(../uploads/blank.png);
+    background-size: cover;
+    background-position: center;
+    border-radius: 8px;
+    width: 100%;
+    min-height: 23.5em;
+    text-align: center;
+    padding: 1em;
+    color: #333;
+}
+
 .icon-menu:before { content: '\f0c9'; }
 .icon-search:before { content: '\e803'; }
 .icon-comment:before { content: '\e800'; }
