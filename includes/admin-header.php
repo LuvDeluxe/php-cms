@@ -12,7 +12,6 @@
   <body>
     <header class="header-admin">
       <div class="container">
-        <a href="skip-link" href="#content">Skip to content</a>
         <div class="logo">
           <a href="../index.php"><img src="../img/logo.png" alt="Creative Folk"></a>
         </div>
