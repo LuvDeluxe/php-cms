@@ -20,8 +20,8 @@
             <span class="icon-menu"></span><span class="hidden">Menu</span>
           </button>
           <ul id="menu">
-            <li><a href="#">Articles</a></li> // add path
-            <li><a href="#">Categories</a></li> // add path
+            <li><a href="#">Articles</a></li>
+            <li><a href="#">Categories</a></li>
           </ul>
         </nav>
       </div>
