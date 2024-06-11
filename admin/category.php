@@ -44,11 +44,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   } else {
     $arguments = $category;
     if ($id) {
-
+      $sql = "UPDATE category
+              SET name = :name, description = :description,
+                  navigation = :navigation
+                  WHERE id = :id;";
     } else {
-
+      unset($arguments['id']);
+      $sql = "INSERT INTO category (name, description, navigation)
+                VALUES(:name, :description, :navigation);";
+    }
+    try {
+      pdo($pdo, $sql, $arguments);
+      redirect('categories.php', ['success' => 'Category saved']);
+    } catch (PDOException $e) {
+      if ($e->errorInfo[1] === 1062) {
+        $errors['warning'] = 'Category name already in use';
+      } else {
+        throw $e;
+      }
     }
   }
-
 }
 
