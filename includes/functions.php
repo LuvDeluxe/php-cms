@@ -47,3 +47,18 @@ function redirect(string $location, array $parameters = [], $response_code = 302
   header('Location: ' . $location, $response_code);
   exit;
 }
+
+// create file name
+function create_filename(string $filename, string $uploads) : string
+{
+  $basename = pathinfo($filename, PATHINFO_FILENAME);
+  $extension = pathinfo($filename, PATHINFO_EXTENSION);
+  $cleanname = preg_replace("/[^A-z0-9]/", "-", $basename);
+  $filename = $cleanname . '.' . $extension;
+  $i = 0;
+  while (file_exists($uploads . $filename)) {
+    $i = $i + 1;
+    $filename = $basename . $i . '.' . $extension;
+  }
+  return $filename;
+}
