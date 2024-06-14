@@ -73,3 +73,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $destination = $uploads . $article['image_file'];
   }
 }
+
+$article['title'] = $_POST['title'];
+$article['summary'] = $_POST['summary'];
+$article['content'] = $_POST['content'];
+$article['member_id'] = $_POST['member_id'];
+$article['category_id'] = $_POST['category_id'];
+$article['published'] = (isset($_POST['published']) AND ($_POST['published'] === 1)) ? 1 : 0;
+
+$errors['title'] = is_text($article['title'], 1, 80) ? '' : 'Title must be 1-80 characters';
+$errors['summary'] = is_text($article['summary'], 1, 254) ? '' : 'Summary must be 1-254 characters';
+$errors['content'] = is_text($article['content'], 1, 100000) ? '' : 'Article must be 1-100,000 characters';
+$errors['member'] = is_member_id($article['member_id'], $authors) ? '' : 'Please select an author';
+$errors['category'] = is_category_id($article['category_id'], $categories) ? '' : 'Please select a category';
+$invalid = implode($errors);
