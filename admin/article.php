@@ -79,7 +79,7 @@ $article['summary'] = $_POST['summary'];
 $article['content'] = $_POST['content'];
 $article['member_id'] = $_POST['member_id'];
 $article['category_id'] = $_POST['category_id'];
-$article['published'] = (isset($_POST['published']) AND ($_POST['published'] === 1)) ? 1 : 0;
+$article['published'] = (isset($_POST['published']) and ($_POST['published'] === 1)) ? 1 : 0;
 
 $errors['title'] = is_text($article['title'], 1, 80) ? '' : 'Title must be 1-80 characters';
 $errors['summary'] = is_text($article['summary'], 1, 254) ? '' : 'Summary must be 1-254 characters';
@@ -87,3 +87,50 @@ $errors['content'] = is_text($article['content'], 1, 100000) ? '' : 'Article mus
 $errors['member'] = is_member_id($article['member_id'], $authors) ? '' : 'Please select an author';
 $errors['category'] = is_category_id($article['category_id'], $categories) ? '' : 'Please select a category';
 $invalid = implode($errors);
+
+if ($invalid) {
+  $errors['warning'] = 'Please correct the errors';
+} else {
+  $arguments = $article;
+  try {
+    $pdo->beginTransaction();
+    if ($destination) {
+      $imagick = new \Imagick($temp);
+      $imagick->cropThumbnailImage(1200, 700);
+      $imagick->writeImage($destination);
+
+      $sql = "INSERT INTO image(file, alt)
+                VALUES (:file, :alt);";
+      pdo($pdo, $sql, [$arguments['image_file'], $arguments['image_alt'],]);
+      $arguments['image_id'] = $pdo->lastInsertId();
+    }
+    unset($arguments['image_file'], $arguments['image_alt']);
+    if ($id) {
+      $sql = "UPDATE ARTICLE 
+             SET title = :title, summary = :summary, content = :content,
+                 category_id = :category_id, member_id = :member_id,
+                 image_id = :image_id, published = :published
+                 WHERE id = :id;";
+    } else {
+      unset($arguments['id']);
+      $sql = "INSERT INTO article (title, summary, content, category_id,
+                     member_id, image_id, published)
+                     VALUES (:title, :summary, :content, :category_id,
+                             :member_id, :image_id, :published);";
+    }
+    pdo($pdo, $sql, $arguments);
+    $pdo->commit();
+    redirect('articles.php', ['success' => 'Article Saved']);
+  } catch (PDOException $e) {
+    $pdo->rollBack();
+    if (file_exists($destination)) {
+      unlink($destination);
+    }
+    if ($e->errorInfo[1] === 1062) {
+      $errors['warning'] = 'Article title already exists';
+    } else {
+      throw $e;
+    }
+  }
+}
+$article['image_file'] = $saved_image ? $article['image_file'] : '';
