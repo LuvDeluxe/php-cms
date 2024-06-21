@@ -134,3 +134,26 @@ if ($invalid) {
   }
 }
 $article['image_file'] = $saved_image ? $article['image_file'] : '';
+?>
+
+<form action="article.php?id=<?= $id ?>" method="post" enctype="multipart/form-data">
+  <h2>Edit Article</h2>
+
+  <?php if($errors['warning']) { ?>
+    <div class="alert alert-danger"><?= $errors['warning']?></div>
+  <?php } ?>
+
+  <?php if(!$article['image_file']) {?>
+    Upload image: <input type="file" name="image" class="form-control-file" id="image">
+    <span class="errors"><?= $errors['image_file']?></span>
+    Alt text: <input type="text" name="image_alt">
+    <span class="errors"><?= $errors['image_alt']?></span>
+  <?php } else { ?>
+    <label>Image:</label>
+    <img src="../uploads/<?= html_escape($article['file']) ?>" alt="<?= html_escape($article['image_alt'])?>" />
+    <p class="alt"><strong>Alt text:</strong><?= html_escape($article['image_alt']) ?></p>
+    <a href="alt-text-edit.php?id=<?= $id ?>">Edit alt text</a>
+    <a href="image-delete.php?id=<?= $id ?>">Delete image</a>
+  <?php } ?>
+
+</form>
