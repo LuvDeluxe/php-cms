@@ -137,23 +137,49 @@ $article['image_file'] = $saved_image ? $article['image_file'] : '';
 ?>
 
 <form action="article.php?id=<?= $id ?>" method="post" enctype="multipart/form-data">
-  <h2>Edit Article</h2>
+    <h2>Edit Article</h2>
 
-  <?php if($errors['warning']) { ?>
-    <div class="alert alert-danger"><?= $errors['warning']?></div>
+  <?php if ($errors['warning']) { ?>
+      <div class="alert alert-danger"><?= $errors['warning'] ?></div>
   <?php } ?>
 
-  <?php if(!$article['image_file']) {?>
-    Upload image: <input type="file" name="image" class="form-control-file" id="image">
-    <span class="errors"><?= $errors['image_file']?></span>
-    Alt text: <input type="text" name="image_alt">
-    <span class="errors"><?= $errors['image_alt']?></span>
+  <?php if (!$article['image_file']) { ?>
+      Upload image: <input type="file" name="image" class="form-control-file" id="image">
+      <span class="errors"><?= $errors['image_file'] ?></span>
+      Alt text: <input type="text" name="image_alt">
+      <span class="errors"><?= $errors['image_alt'] ?></span>
   <?php } else { ?>
-    <label>Image:</label>
-    <img src="../uploads/<?= html_escape($article['file']) ?>" alt="<?= html_escape($article['image_alt'])?>" />
-    <p class="alt"><strong>Alt text:</strong><?= html_escape($article['image_alt']) ?></p>
-    <a href="alt-text-edit.php?id=<?= $id ?>">Edit alt text</a>
-    <a href="image-delete.php?id=<?= $id ?>">Delete image</a>
+      <label>Image:</label>
+      <img src="../uploads/<?= html_escape($article['file']) ?>" alt="<?= html_escape($article['image_alt']) ?>"/>
+      <p class="alt"><strong>Alt text:</strong><?= html_escape($article['image_alt']) ?></p>
+      <a href="alt-text-edit.php?id=<?= $id ?>">Edit alt text</a>
+      <a href="image-delete.php?id=<?= $id ?>">Delete image</a>
   <?php } ?>
+
+    Title: <input type="text" name="title" value="<?= html_escape($article['title']) ?>">
+    <span class="errors"><?= $errors['title'] ?></span>
+    Summary: <textarea name="summary"><?= html_escape($article['summary']) ?></textarea>
+    <span class="errors"><?= $errors['summary'] ?></span>
+    Content: <textarea name="content"><?= html_escape($article['content']) ?></textarea>
+    <span class="errors"><?= $errors['content'] ?></span>+
+    Author: <select name="member_id">
+    <?php foreach ($authors as $author) { ?>
+        <option value="<?= $author['id'] ?>" <?= ($article['member_id']) === $author['id'] ? 'selected' : '' ?>>
+          <?= html_escape($author['forename'] . ' ' . $author['surname']) ?>
+        </option>
+    <?php } ?>
+    </select>
+    <span class="errors"><?= $errors['author'] ?></span>
+    Category: <select name="category_id">
+    <?php foreach ($categories as $category) { ?>
+        <option value="<?= $category['id'] ?>" <?= ($article['category_id'] === $category['id']) ? 'selected' : '' ?>>
+          <?= html_escape($category['name']) ?>
+        </option>
+    <?php } ?>
+    </select>
+    <span class="errors"><?= $errors['category'] ?></span>
+    <input type="checkbox" name="published" value="1"
+      <?= ($article['published'] === 1) ? 'checked' : '' ?>> Published
+    <input type="submit" name="create" value="save" class="btn btn-primary">
 
 </form>
