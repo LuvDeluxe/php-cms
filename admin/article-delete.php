@@ -2,8 +2,8 @@
 declare(strict_types=1);
 require_once '../includes/database-connection.php';
 require_once '../includes/functions.php';
-$id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 
+$id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$id) {
   redirect('articles.php', ['failure' => 'Article not found']);
 }
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $pdo->beginTransaction();
 
     if ($article['image_id']) {
-      $sql = "UPDATE article SET image_id = null WHERE id = :article_id;";
+      $sql = "UPDATE article SET image_id = null WHERE id = :id;";
       pdo($pdo, $sql, [$id]);
       $sql = "DELETE FROM image WHERE id = :id";
       pdo($pdo, $sql, [$article['image_id']]);
