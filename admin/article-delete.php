@@ -38,8 +38,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     pdo($pdo, $sql, [$id]);
     $pdo->commit();
     redirect('articles.php', ['success' => 'Article deleted']);
-  } catch (PDOException $e){
+  } catch (PDOException $e) {
     $pdo->rollBack();
     throw $e;
   }
 }
+?>
+
+<?php include '../includes/admin-header.php'; ?>
+<main class="container admin" id="content">
+    <form action="article-delete.php?id=<?= $id ?>" method="POST" class="narrow">
+        <h1>Delete Article</h1>
+        <p>Click confirm to delete the article <em><?= html_escape($article['title']) ?></em></p>
+        <input type="submit" name="delete" value="Confirm" class="btn btn-primary">
+        <a href="articles.php" class="btn btn-danger">Cancel</a>
+    </form>
+</main>
+<?php include '../includes/admin-footer.php'; ?>

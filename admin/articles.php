@@ -40,7 +40,7 @@ $articles = pdo($pdo, $sql)->fetchAll();
             </tr>
           <?php foreach ($articles as $article) { ?>
               <tr>
-                  <td><img src="../uploads"<?= html_escape($article['image_file'] ?? 'blank.png') ?>
+                  <td><img src="../uploads/<?= html_escape($article['image_file'] ?? 'blank.png') ?>"
                            alt="<?= html_escape($article['image_alt']) ?>"></td>
                   <td><strong><?= html_escape($article['title']) ?></strong></td>
                   <td><?= format_date($article['created']) ?></td>
