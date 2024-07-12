@@ -5,3 +5,5 @@
 public/includes/database-connection.php
 public/includes/database-connection.php
 package.xml
+/config/
+/.htaccess
