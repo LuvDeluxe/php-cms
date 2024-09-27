@@ -1,6 +1,6 @@
 <?php
 define('APP_ROOT', dirname(__FILE__, 2));
-require APP_ROOT . '/includes/functions.php';
+require APP_ROOT . '/src/functions.php';
 require APP_ROOT . '/config/config.php';
 
 if (DEV === false) {
