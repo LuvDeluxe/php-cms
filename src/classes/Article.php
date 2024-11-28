@@ -2,13 +2,26 @@
 
 class Article
 {
+  // Database connection object
   protected $db;
 
+  /**
+   * Constructor to initialize the database connection.
+   *
+   * @param Database $db An instance of the Database class for database operations.
+   */
   public function __construct(Database $db)
   {
     $this->db = $db;
   }
 
+  /**
+   * Retrieves an article by its ID.
+   *
+   * @param int $id The ID of the article.
+   * @param bool $published Whether to fetch only published articles, defaults to true.
+   * @return array|null Returns an associative array with article details or null if not found.
+   */
   public function get(int $id, bool $published = true)
   {
     $sql = "SELECT a.id, a.title, a.summary, a.content, a.created, a.category_id,
@@ -29,8 +42,18 @@ class Article
     return $this->db->runSQL($sql, [$id])->fetch();
   }
 
+  /**
+   * Fetches multiple articles based on various criteria.
+   *
+   * @param bool $published Whether to filter for published articles only.
+   * @param int|null $category Category ID to filter by, or null for all categories.
+   * @param int|null $member Member ID to filter by, or null for all members.
+   * @param int $limit Maximum number of articles to return, defaults to 1000.
+   * @return array An array of article objects.
+   */
   public function getAll($published = true, $category = null, $member = null, $limit = 1000): array
   {
+    // Prepare arguments for the SQL query
     $arguments['category'] = $category;
     $arguments['category1'] = $category;
     $arguments['member'] = $member;
@@ -56,8 +79,15 @@ class Article
     return $this->db->runSQL($sql, $arguments)->fetchAll();
   }
 
+  /**
+   * Counts the number of articles that match a search term.
+   *
+   * @param string $term The search term.
+   * @return int The count of matching articles.
+   */
   public function searchCount(string $term): int
   {
+    // Prepare the search term for SQL LIKE clauses
     $arguments['term1'] = '%' . $term . '%';
     $arguments['term2'] = '%' . $term . '%';
     $arguments['term3'] = '%' . $term . '%';
@@ -70,8 +100,17 @@ class Article
     return $this->db->runSQL($sql, $arguments)->fetchColumn();
   }
 
+  /**
+   * Searches for articles by term with pagination.
+   *
+   * @param string $term The search term.
+   * @param int $show Number of results to return per page, defaults to 3.
+   * @param int $from Offset for pagination, defaults to 0.
+   * @return array An array of articles matching the search term.
+   */
   public function search(string $term, int $show = 3, int $from = 0): array
   {
+    // Prepare the search term for SQL LIKE clauses
     $arguments['term1'] = '%' . $term . '%';
     $arguments['term2'] = '%' . $term . '%';
     $arguments['term3'] = '%' . $term . '%';
