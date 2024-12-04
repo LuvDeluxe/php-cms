@@ -1,5 +1,14 @@
 <?php
-
+/**
+ * The Database class extends PHP's PDO (PHP Data Objects) to provide a simplified interface for database operations.
+ *
+ * This class:
+ * - Enhances database connectivity with pre-defined options for security and usability.
+ * - Implements a method to run SQL queries with or without prepared statements to prevent SQL injection.
+ * - Automatically sets PDO to throw exceptions on errors, promoting robust error handling.
+ * - Uses associative arrays by default for fetching results, which simplifies data manipulation in many scenarios.
+ * - Provides an abstraction layer over PDO, potentially allowing for easier testing or mocking of database operations.
+ */
 class Database extends PDO
 {
   /**
