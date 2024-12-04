@@ -1,5 +1,15 @@
 <?php
-
+/**
+ * The Article class manages operations related to articles in the CMS, including retrieval, listing, and searching.
+ *
+ * This class provides methods to:
+ * - Fetch a single article by its ID with optional filtering for published status.
+ * - Retrieve multiple articles with various filtering options like publication status, category, and author.
+ * - Count articles matching a search term.
+ * - Search for articles with pagination support, allowing for keyword search across title, summary, and content.
+ *
+ * It uses dependency injection for the database connection, which is passed to the constructor, ensuring all database operations are performed through a consistent interface.
+ */
 class Article
 {
   // Database connection object

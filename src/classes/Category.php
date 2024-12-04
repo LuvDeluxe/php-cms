@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * The Category class handles all category-related operations in the CMS, facilitating the management of content categories.
+ *
+ * This class provides functionality to:
+ * - Retrieve individual categories or all categories.
+ * - Count the total number of categories.
+ * - Create, update, and delete categories with error handling for common database integrity issues.
+ *
+ * It ensures data consistency by checking for duplicate keys during creation or update, and handles foreign key constraints when deleting categories, providing a robust interface for category management within the CMS.
+ */
 class Category
 {
   // Database connection object
