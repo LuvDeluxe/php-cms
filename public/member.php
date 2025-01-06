@@ -30,9 +30,13 @@ if (!$member) {
 }
 // Retrieve all articles by this member, sorted by date (assuming true means latest first)
 $articles = $cms->getArticle()->getAll(true, null, $id);
+// Fetch all categories for the navigation menu
 $navigation = $cms->getCategory()->getAll();
+// Set the section identifier (empty if there's no specific section for this page)
 $section = '';
+// Construct the title using the member's full name
 $title = $member['forename'] . ' ' . $member['surname'];
+// Create a meta description for SEO, combining the member's name and site identifier
 $description = $title . ' on Creative Folk';
 ?>
 
