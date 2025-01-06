@@ -1,17 +1,34 @@
 <?php
-declare(strict_types=1);
-include './src/bootstrap.php';
+/**
+ * Member Profile Page
+ *
+ * This script:
+ * - Validates and retrieves a member's ID from the URL.
+ * - Fetches member details and their articles from the CMS.
+ * - Sets up page metadata including title and description.
+ * - Displays member information and a grid of their published articles.
+ * - Includes error handling for missing or invalid member IDs, redirecting to a 404 page.
+ * - Uses strict typing for better type safety.
+ */
 
+// Enable strict typing for better type integrity
+declare(strict_types=1);
+// Include necessary bootstrap file for initialization
+include './src/bootstrap.php';
+// Get and validate the member ID from the URL query string
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$id) {
+  // If no valid ID, redirect to 404 page
   include APP_ROOT . '/page-not-found.php';
 }
 
+// Fetch member details from CMS using the validated ID
 $member = $cms->getMember()->get($id);
+// If no member found, redirect to 404 page
 if (!$member) {
   include APP_ROOT . '/page-not-found.php';
 }
-
+// Retrieve all articles by this member, sorted by date (assuming true means latest first)
 $articles = $cms->getArticle()->getAll(true, null, $id);
 $navigation = $cms->getCategory()->getAll();
 $section = '';
