@@ -1,52 +1,36 @@
 <?php
 declare(strict_types=1);
-include '../includes/database-connection.php';
-include '../includes/functions.php';
-include '../includes/validate.php';
+include '../../src/bootstrap.php';
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-$image = [
-  'file' => '',
-  'alt' => ''
-];
+$article = [];
+$errors = ['alt' => '',
+  'warning' => ''];
 
-$errors = [
-  'alt' => '',
-  'warning' => ''
-];
-
-if ($id) {
-  $sql = "SELECT i.id, i.file, i.alt
-        FROM image AS i
-        JOIN article AS a
-        ON i.id = a.image_id
-        WHERE a.id = :id;";
-  $image = pdo($pdo, $sql, [$id])->fetch();
+if (!$id) {
+  redirect('admin/articles.php', ['failure' => 'Article not found']);
 }
-
-if (!$image) {
-  redirect('article.php', ['id' => $id]);
+$article = $cms->getArticle()->get($id, false);
+if (!$article['image_file']) {
+  redirect('admin/article.php', ['id' => $id]);
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-  $image['alt'] = $_POST['image_alt'];
+  $article['image_alt'] = $_POST('image_alt');
 
-  $errors['alt'] = (is_text($image['alt'], 1, 254)) ? '' : 'Alt text for image should be 1 - 254 chars.';
+  $errors['alt'] = (Validate::isText($article['image_alt'], 1, 254)) ? '' : 'Alt text for image should be 1 - 254 characters.';
 
   if ($errors['alt']) {
     $errors['warning'] = 'Please correct error below';
   } else {
-    unset($image['file']);
-    $sql = "UPDATE image
-                SET alt = :alt
-                WHERE id = :id;";
-    pdo($pdo, $sql, $image);
-    redirect('article.php', ['id' => $id]);
+      // TODO: Define altUpdate
+    $cms->getArticle()->altUpdate($article['image_id'], $article['image_alt']);
+    redirect('admin/article.php', ['id' => $id]);
   }
 }
 ?>
 
-<?php include '../includes/admin-header.php'; ?>
+<?php include APP_ROOT . '/public/includes/admin-header.php'; ?>
 <main class="container admin" id="content">
     <form action="alt-text-edit.php?id=<?= $id ?>" method="POST" class="narrow">
         <h1>Update alt text</h1>
@@ -67,5 +51,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <img src="../uploads/<?= $image['file'] ?>" alt="<?= html_escape($image['alt']) ?>">
     </form>
 </main>
-<?php include '../includes/admin-footer.php'; ?>
+<?php include APP_ROOT . '/public/includes/admin-footer.php' ?>
 
