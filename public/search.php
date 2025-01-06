@@ -47,6 +47,7 @@ $section = ''; // Set to empty as there's no specific section for this page
 $title = 'Search results for ' . html_escape($term);
 // Create a meta description for SEO purposes
 $description = $title . ' on Creative Folk';
+
 ?>
 
 <?php include APP_ROOT . '/includes/header.php' ?>
