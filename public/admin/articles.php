@@ -1,26 +1,23 @@
 <?php
-declare(strict_types=1);
-include '../includes/database-connection.php';
-include '../includes/functions.php';
+/**
+ * This script displays all articles in the CMS, including their details like title, summary, author,
+ * and publication status. It also includes functionality for success/failure messages from previous
+ * actions like article deletion or editing.
+ */
 
+// Ensures all functions require type declarations
+declare(strict_types=1);
+// Include bootstrap
+include '../../src/bootstrap.php';
+// Handle GET parameters for success or failure messages
 $success = $_GET['success'] ?? null;
 $failure = $_GET['failure'] ?? null;
 
-$sql = "SELECT a.id, a.title, a.summary, a.created, a.category_id, a.member_id, a.published,
-               c.name     AS category,
-               CONCAT(m.forename, ' ', m.surname) AS author,
-               i.file     AS image_file,
-               i.alt      AS image_alt 
-          FROM article    AS a
-          JOIN category   AS c   ON a.category_id = c.id
-          JOIN member     AS m   ON a.member_id   = m.id
-          LEFT JOIN image AS i   ON a.image_id    = i.id
-         ORDER BY a.id DESC;";
-
-$articles = pdo($pdo, $sql)->fetchAll();
+// Get article summaries
+$articles = $cms->getArticle()->getAll(0);
 ?>
 
-<?php include '../includes/admin-header.php'; ?>
+<?php include APP_ROOT . '/public/includes/admin-header.php'; ?>
     <main class="container" id="content">
         <section class="header">
             <h1>Articles</h1>
@@ -51,4 +48,4 @@ $articles = pdo($pdo, $sql)->fetchAll();
           <?php } ?>
         </table>
     </main>
-<?php include '../includes/admin-footer.php'; ?>
+<?php include APP_ROOT . '/public/includes/admin-footer.php'; ?>
