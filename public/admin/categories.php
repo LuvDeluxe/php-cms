@@ -1,15 +1,22 @@
 <?php
+/**
+ * This script manages the display of categories in the CMS. It lists all categories with options to add,
+ * edit, or delete them. It also handles displaying success or failure messages from category operations.
+ */
+// Ensures all functions require type declarations
 declare(strict_types=1);
-include '../includes/database-connection.php';
-include '../includes/functions.php';
+// Include bootstrap file
+include '../../src/bootstrap.php';
 
+// Handle GET parameters for success or failure messages
 $success = $_GET['success'] ?? null;
 $failure = $_GET['failure'] ?? null;
 
-$sql = "SELECT id, name, navigation FROM category;";
-$categories = pdo($pdo, $sql)->fetchAll();
+// Get all categories
+$categories = $cms->getCategory()->getAll();
+
 ?>
-<?php include '../includes/admin-header.php' ?>
+<?php include APP_ROOT . '/public/includes/admin-header.php'; ?>
 <main class="container" id="content">
   <section class="header">
     <h1>Categories</h1>
@@ -39,4 +46,4 @@ $categories = pdo($pdo, $sql)->fetchAll();
     <?php } ?>
   </table>
 </main>
-<?php include '../includes/admin-footer.php'; ?>
+<?php include APP_ROOT . '/public/includes/admin-footer.php'; ?>
