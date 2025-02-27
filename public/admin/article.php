@@ -45,20 +45,79 @@ $categories = $cms->getCategory()->getAll();
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   $errors['image_file'] = ($temp === '' and $_FILES['image']['error'] === 1) ? 'File too big' : '';
 
+  // If image was uploaded, get image data and validate
   if ($temp and $_FILES['image']['error'] == 0) {
     $article['image_alt'] = $_POST['image_alt'];
 
-    $errors['image_file'] = in_array(mime_content_type($temp), MEDIA_TYPES) ? '' : 'Wrong file type';
+    // Validate image file
+    $errors['image_file'] = in_array(mime_content_type($temp), MEDIA_TYPES)
+      ? '' : 'Wrong file type. ';
     $extension = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
-    $errors['image_file'] .= in_array($extension, FILE_EXTENSIONS) ? '' : 'Wrong file extension';
-    $errors['image_file'] .= ($_FILES['image']['size'] <= MAX_SIZE) ? '' : 'File too big';
-    $errors['image_alt'] = 
+    $errors['image_file'] .= in_array($extension, FILE_EXTENSIONS)
+      ? '' : 'Wrong file extension. ';
+    $errors['image_file'] .= ($_FILES['image']['size'] <= MAX_SIZE)
+      ? '' : 'File too big. ';
+    $errors['image_alt']  = (Validate::isText($article['image_alt'], 1, 254))
+      ? '' : 'Alt text must be 1-254 characters.';
 
+    // If image file is valid, specify the location to save it
+    if ($errors['image_file'] === '' and $errors['image_alt'] === '') {
+      $article['image_file'] = create_filename($_FILES['image']['name'], UPLOADS);
+      $destination = UPLOADS . $article['image_file'];
+    }
+  }
+
+  // Get article data
+  $article['title']       = $_POST['title'];
+  $article['summary']     = $_POST['summary'];
+  $article['content']     = $_POST['content'];
+  $article['member_id']   = $_POST['member_id'];
+  $article['category_id'] = $_POST['category_id'];
+  $article['published']   = (isset($_POST['published']) and ($_POST['published'] == 1)) ? 1 : 0;
+
+  // Validate article data and create error messages if it is invalid
+  $errors['title']    = Validate::isText($article['title'], 1, 80)
+    ? '' : 'Title must be 1-80 characters';
+  $errors['summary']  = Validate::isText($article['summary'], 1, 254)
+    ? '' : 'Summary must be 1-254 characters';
+  $errors['content']  = Validate::isText($article['content'], 1, 100000)
+    ? '' : 'Article must be 1-100,000 characters';
+  $errors['member']   = Validate::isMemberId($article['member_id'], $authors)
+    ? '' : 'Please select an author';
+  $errors['category'] = Validate::isCategoryId($article['category_id'], $categories)
+    ? '' : 'Please select a category';
+
+  $invalid = implode($errors);
+
+  // If invalid data
+  if ($invalid) {
+    // Store error
+    $errors['warning'] = 'Please correct form errors';
+  } else {
+    // Save data as $params
+    $arguments = $article;
+    // If id exists update
+    if ($id) {
+      // Update article
+      $saved = $cms->getArticle()->update($arguments, $temp, $destination);
+    } else {
+      // Remove id from arguments
+      unset($arguments['id']);
+      // Create article
+      $saved = $cms->getArticle()->create($arguments, $temp, $destination);
+    }
+    // If updated
+    if ($saved == true) {
+      // Redirect
+      redirect('admin/articles.php', ['success' => 'Article saved']);
+    } else {
+      $errors['warning'] = 'Article title already in use';
+    }
   }
 }
 ?>
 
-<?php include '../includes/admin-header.php'; ?>
+<?php include APP_ROOT . '/public/includes/admin-header.php' ?>
 <form action="article.php?id=<?= $id ?>" method="POST" enctype="multipart/form-data">
     <main class="container admin" id="content">
 
@@ -141,4 +200,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
     </main>
 </form>
-<?php include '../includes/admin-footer.php'; ?>
+<?php include APP_ROOT . '/public/includes/admin-footer.php' ?>
