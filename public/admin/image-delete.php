@@ -1,39 +1,39 @@
 <?php
-declare(strict_types=1);
-include '../includes/database-connection.php';
-include '../includes/functions.php';
+/**
+ * This script manages the deletion of an image associated with an article in the CMS.
+ * It confirms the existence of the image, provides a confirmation form for deletion,
+ * and handles the database and file system cleanup upon form submission.
+ */
 
+// Ensures strict typing for all functions
+declare(strict_types=1);
+// Load cms dependencies and configuration
+include '../../src/bootstrap.php';
+
+// Retrieve and validate the article ID from GET parameters
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 $image = [];
 
-if ($id) {
-  $sql = "SELECT i.id, i.file, i.alt
-          FROM image AS i
-          JOIN article AS a
-          ON i.id = a.image_id
-          WHERE a.id = :id;";
-  $image = pdo($pdo, $sql, [$id])->fetch();
+// Redirects to article list if ID is invalid or missing.
+if (!$id) {
+  redirect('admin/articles.php', ['failure' => 'Article not found']);
 }
-
-if (!$image) {
-  redirect('article.php', ['id' => $id]);
+// Fetch article data by ID
+$article = $cms->getArticle()->get($id, false);
+// Redirects if article has no associated image
+if (!$article['image_file']) {
+  redirect('admin/article.php', ['id' => $id]);
 }
-
-$path = '../uploads/' . $image['file'];
-
+// delete and redirect
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-  $sql = "UPDATE article SET image_id = null WHERE id = :id;";
-  pdo($pdo, $sql, [$id]);
-  $sql = "DELETE FROM image WHERE id = :id;";
-  pdo($pdo, $sql, [$image['id']]);
-  if (file_exists($path)) {
-    $unlink = unlink($path);
-  }
-  redirect('article.php', ['id' => $id]);
+  $path = APP_ROOT . '/public/uploads/' . $article['image_file'];
+  $cms->getArticle()->imageDelete($article['image_id'], $path, $id);
+  redirect('admin/article.php', ['id' => $id]);
 }
+
 ?>
 
-<?php include '../includes/admin-header.php'; ?>
+<?php include APP_ROOT . '/public/includes/admin-header.php'; ?>
 <main class="container admin" id="content">
     <form action="image-delete.php?id=<?= $id ?>" method="POST" class="narrow">
         <h1>Delete image</h1>
@@ -43,4 +43,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <a href="article.php?id=<?= $id ?>" class="btn btn-danger">Cancel</a>
     </form>
 </main>
-<?php include '../includes/admin-footer.php'; ?>
+<?php include APP_ROOT . '/public/includes/admin-footer.php'; ?>
