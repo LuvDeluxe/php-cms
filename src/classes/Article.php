@@ -147,4 +147,112 @@ class Article
 
     return $this->db->runSQL($sql, $arguments)->fetchAll();
   }
+
+  // ADMIN METHODS
+  public function count(): int
+  {
+    $sql = "SELECT COUNT(id) FROM article;";
+    return $this->db->runSql($sql)->fetchColumn();
+  }
+
+  public function create(array $article, string $temporary, string $destination): bool
+  {
+    try {
+      $this->db->beginTransaction();
+      if ($destination) {
+        // Crop and save file
+        $imagick = new \Imagick($temporary);
+        $imagick->cropThumbnailImage(1200, 700);
+        $imagick->writeImage($destination);
+
+        $sql = "INSERT INTO image (file, alt)
+                        VALUES (:file, :alt);";
+        $this->db->runSql($sql, [$article['image_file'], $article['image_alt']]);
+        $article['image_id'] = $this->db->lastInsertId();
+      }
+      unset($article['image_file'], $article['image_alt']);
+      $sql = "INSERT INTO article (title, summary, content, category_id, member_id,
+                           image_id, published)
+                    VALUES (:title, :summary, :content, :category_id, :member_id,
+                           :image_id, :published);";
+      $this->db->runSql($sql, $article);
+      $this->db->commit();
+      return true;
+    } catch (Exception $e) {
+      $this->db->rollBack();
+      if (file_exists($destination)) {
+        unlink($destination);
+      }
+      if (($e instanceof PDOException) and ($e->errorInfo[1] === 1062)) {
+        return false;
+      } else {
+        throw $e;
+      }
+    }
+  }
+
+  public function update(array $article, string $temporary, string $destination): bool
+  {
+    try {
+      $this->db->beginTransaction();
+      if ($destination) {
+
+        $imagick = new \Imagick($temporary);
+        $imagick->cropThumbnailImage(1200, 700);
+        $imagick->writeImage($destination);
+
+        $sql = "INSERT INTO image (file, alt)
+                  VALUES (:file, :alt);";
+        $this->db->runSql($sql, [$article['image_file'], $article['image_alt']]);
+        $article['image_id'] = $this->db->lastInsertId();
+      }
+      // Remove unwanted elements from $article
+      unset($article['category'], $article['created'], $article['author'], $article['image_file'], $article['image_alt']);
+      $sql = "UPDATE article SET title = :title, summary = :summary, content = :content,
+                           category_id = :category_id, member_id = :member_id,
+                           image_id = :image_id, published = :published
+                     WHERE id = :id;";
+      $this->db->runSql($sql, $article)->rowCount();
+      $this->db->commit();
+      return true;
+    } catch (Exception $e) {
+      $this->db->rollBack();
+      if (file_exists($destination)) {
+        unlink($destination);
+      }
+      if (($e instanceof PDOException) and ($e->errorInfo[1] === 1062)) {
+        return false;
+      } else {
+        throw $e;
+      }
+    }
+  }
+
+  public function delete(int $id): bool
+  {
+    $sql = "DELETE FROM article WHERE id = :id;";
+    $this->db->runSql($sql, [$id]);
+    return true;
+  }
+
+  public function imageDelete(int $image_id, string $path, int $article_id)
+  {
+    $sql = "UPDATE article SET image_id = null
+               WHERE id = :article_id;";
+    $this->db->runSql($sql, [$article_id]);
+    $sql = "DELETE FROM image
+               WHERE id = :id;";
+    $this->db->runSql($sql, [$image_id]);
+
+    if (file_exists($path)) {
+      unlink($path);
+    }
+  }
+
+  public function altUpdate(int $image_id, string $alt)
+  {
+    $sql = "UPDATE image SET alt = :alt
+               WHERE id = :article_id;";
+    $this->db->runSql($sql, [$alt, $image_id]);
+  }
 }
